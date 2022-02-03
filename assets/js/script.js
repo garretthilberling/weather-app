@@ -6,7 +6,7 @@ var forecastSection = document.querySelector("#forecast");
 
 function formSubmit(event) {
   event.preventDefault();
-  var cityName = searchCity.value.trim();
+  var cityName = searchCity.value.charAt(0).toUpperCase() + searchCity.value.slice(1).trim(); //the value entered by the viewer will always be returned with the first letter being capitalized.
   if (cityName) {
     getWeather(cityName);
     searchCity.value = "";
@@ -17,6 +17,7 @@ function formSubmit(event) {
 
 function getWeather(city) {
     var cityResult = document.createElement("div");
+    cityResult.classList.add("card");
     cityResult.innerHTML = `<h3 class='card-header'>Showing forecast for ${city}:</h3>`;
     cityResultSection.appendChild(cityResult);
   var cityUrl =
@@ -40,14 +41,26 @@ function getWeather(city) {
             return response.json();
           }
         })
-        .then(function (data) {
-          for (var i = 0; i < data.length; i++) {
-             var container = createElement("div").setClass("card");
-             var header = createElement("h4").setClass("card-header").textContent(city);
-             var body = createElement("div").setClass("card-body").
-             container.appendChild(container, header);
+        .then(function (list) {
+            //   for (var i = 0; i < data.length; i++) {
+            var temp = list.temp.day;
+            var wind = list.speed;
+            var humidity = list.humidity;
+            // var uvIndex = data.current.uvi;
+             var container = document.createElement("div");
+             container.classList.add("card");
+             var header = document.createElement("h4");
+             header.classList.add("card-header");
+             header.textContent = city;
+             container.appendChild(header);
+             var body = document.createElement("div");
+             body.classList.add("card-body");
+             body.textContent = `<ul><li>Temp: ${temp}</li> <li>wind: ${wind}</li> <li>humidity:${humidity} `;
+
+
+             container.appendChild(body);
              forecastSection.appendChild(container);
-          }
+        //   }
         });
     });
 }
