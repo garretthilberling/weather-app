@@ -2,73 +2,84 @@ var apiKey = "ee668b86cfbebe9a187b56c01774d622";
 var searchForm = document.querySelector("#search-form");
 var searchCity = document.querySelector("#city-name");
 var cityResultSection = document.querySelector("#city-result");
-var forecastSection = document.querySelector("#forecast");
+var forecastToday = document.querySelector("#forecast");
+var forecastWeek = document.querySelector("#forecast-week");
 
 function formSubmit(event) {
   event.preventDefault();
-  var cityName = searchCity.value.charAt(0).toUpperCase() + searchCity.value.slice(1).trim(); //the value entered by the viewer will always be returned with the first letter being capitalized.
+  var cityName =
+    searchCity.value.charAt(0).toUpperCase() + searchCity.value.slice(1).trim(); //the value entered by the viewer will always be returned with the first letter being capitalized.
   if (cityName) {
     getWeather(cityName);
     searchCity.value = "";
   } else {
     alert("Please provide a city name!");
-  }
+  } 
+//   if (container) {
+//       container.remove();
+//   }
 }
 
 function getWeather(city) {
-    var cityResult = document.createElement("div");
-    cityResult.classList.add("card");
-    cityResult.innerHTML = `<h3 class='card-header'>Showing forecast for ${city}:</h3>`;
-    cityResultSection.appendChild(cityResult);
-  var cityUrl =
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+  var cityResult = document.createElement("div");
+  cityResult.classList.add("card");
+  cityResult.innerHTML = `<h3 class='card-header'>Showing forecast for ${city}:</h3>`;
+  cityResultSection.appendChild(cityResult);
+  var cityUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
   fetch(cityUrl)
     .then(function (response) {
       if (response.ok) {
-          return response.json();
+        return response.json();
       }
     })
     .then(function (data) {
-    //   console.log(data.coord.lat);
       var lat = data.coord.lat;
       var lon = data.coord.lon;
+      var latLonUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
+        window.latLonUrl = latLonUrl; 
+        displayCurrentForecast(latLonUrl);
+        // displayWeekForecast(latLonUrl);
+    })
+}
 
-      var latLonUrl =
-        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly,daily&appid=${apiKey}`;
-      fetch(latLonUrl)
+function displayCurrentForecast (data) {
+    fetch(latLonUrl)
         .then(function (response) {
           if (response.ok) {
             return response.json();
           }
         })
-        .then(function (list) {
-            //   for (var i = 0; i < data.length; i++) {
-            var temp = list.temp.day;
-            var wind = list.speed;
-            var humidity = list.humidity;
-            // var uvIndex = data.current.uvi;
-             var container = document.createElement("div");
-             container.classList.add("card");
-             var header = document.createElement("h4");
-             header.classList.add("card-header");
-             header.textContent = city;
-             container.appendChild(header);
-             var body = document.createElement("div");
-             body.classList.add("card-body");
-             body.textContent = `<ul><li>Temp: ${temp}</li> <li>wind: ${wind}</li> <li>humidity:${humidity} `;
+        .then(function(data) { 
+            console.log(data);
+            var container = $("div");
+            var card = $("div").addClass("card");
+            var header = $("div").addClass("card-header mb-2").html(`<h4>${data.current.dt * 1000}</h4>`);
+            var body = $("div").addClass("card-body").html(`<ul class='list-group'><li class='list-group-item'>Temperature: ${data.current.temp}°</li><li class="list-group-item">wind speed: ${(data.current.wind_speed*2.23694).toFixed(2)}mph</li><li class="list-group-item">humidity: ${data.current.humidity}%</li><li class="list-group-item">${data.daily[0].uvi}</li></ul>`);
+            card.append(header, body);
+            container.append(card);
+            forecastToday.append(container);
+        });  
+}
 
-
-             container.appendChild(body);
-             forecastSection.appendChild(container);
-        //   }
-        });
+function displayWeekForecast(data) {
+    fetch(latLonUrl)
+    .then(function (response) {
+      if (response.ok) {
+        return response.json();
+      }
+    })
+    .then(function(data) {
+        // console.log(data.daily[i].temp.day, data.daily[i].humidity, data.daily[i].wind_speed, data.daily[i].weather[0].icon, data.daily[i].dt);
+        for (var i = 1; i <= 5; i++) {
+        var container = $("div");
+        var card = $("div").addClass("card");
+        var header = $("h4").addClass("card-header").text(data.daily[i].dt*1000);
+        var body = $("div").addClass("card-body").html(`<ul class='list-group'><li class="list-group-item">Temperature: ${data.daily[i].temp.day}°</li><li class="list-group-item">wind speed: ${(data.daily[i].wind_speed*2.23694).toFixed(2)}mph</li><li class="list-group-item">humidity: ${data.daily[i].humidity}%</li></ul>`);
+        card.append(header, body);
+        container.append(card);
+        forecastWeek.append(container);
+        }
     });
 }
 
 searchForm.addEventListener("submit", formSubmit);
-
-// //   // Create weather icon and append to city name element
-// //   var iconEl = document.createElement('img');
-// //   iconEl.setAttribute('src', iconUrl + curr.weather[0].icon + '.png');
-// //   cityNameEl.appendChild(iconEl);
-// //   var iconUrl = 'https://openweathermap.org/img/wn/';
