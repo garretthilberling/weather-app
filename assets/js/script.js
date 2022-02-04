@@ -14,10 +14,10 @@ function formSubmit(event) {
     searchCity.value = "";
   } else {
     alert("Please provide a city name!");
-  } 
-//   if (container) {
-//       container.remove();
-//   }
+  }
+  //   if (container) {
+  //       container.remove();
+  //   }
 }
 
 function getWeather(city) {
@@ -33,53 +33,80 @@ function getWeather(city) {
       }
     })
     .then(function (data) {
+      //   console.log(data);
       var lat = data.coord.lat;
       var lon = data.coord.lon;
       var latLonUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`;
-        window.latLonUrl = latLonUrl; 
-        displayCurrentForecast(latLonUrl);
-        // displayWeekForecast(latLonUrl);
-    })
+      displayCurrentForecast(latLonUrl);
+      //
+    });
 }
 
-function displayCurrentForecast (data) {
-    fetch(latLonUrl)
-        .then(function (response) {
-          if (response.ok) {
-            return response.json();
-          }
-        })
-        .then(function(data) { 
-            console.log(data);
-            var container = $("div");
-            var card = $("div").addClass("card");
-            var header = $("div").addClass("card-header mb-2").html(`<h4>${data.current.dt * 1000}</h4>`);
-            var body = $("div").addClass("card-body").html(`<ul class='list-group'><li class='list-group-item'>Temperature: ${data.current.temp}°</li><li class="list-group-item">wind speed: ${(data.current.wind_speed*2.23694).toFixed(2)}mph</li><li class="list-group-item">humidity: ${data.current.humidity}%</li><li class="list-group-item">${data.daily[0].uvi}</li></ul>`);
-            card.append(header, body);
-            container.append(card);
-            forecastToday.append(container);
-        });  
-}
-
-function displayWeekForecast(data) {
-    fetch(latLonUrl)
+function displayCurrentForecast(url) {
+  fetch(url)
     .then(function (response) {
       if (response.ok) {
         return response.json();
       }
     })
-    .then(function(data) {
-        // console.log(data.daily[i].temp.day, data.daily[i].humidity, data.daily[i].wind_speed, data.daily[i].weather[0].icon, data.daily[i].dt);
-        for (var i = 1; i <= 5; i++) {
-        var container = $("div");
-        var card = $("div").addClass("card");
-        var header = $("h4").addClass("card-header").text(data.daily[i].dt*1000);
-        var body = $("div").addClass("card-body").html(`<ul class='list-group'><li class="list-group-item">Temperature: ${data.daily[i].temp.day}°</li><li class="list-group-item">wind speed: ${(data.daily[i].wind_speed*2.23694).toFixed(2)}mph</li><li class="list-group-item">humidity: ${data.daily[i].humidity}%</li></ul>`);
-        card.append(header, body);
-        container.append(card);
-        forecastWeek.append(container);
-        }
+    .then(function (data) {
+      // console.log(data);
+      var currentDate = new Date(data.daily[0].dt * 1000);
+      // console.log(currentDate);
+      var container = $("div").addClass("col-2");
+      window.container = container;
+      var card = $("div").addClass("card");
+      var header = $("h3")
+        .addClass("card-header mb-2")
+        .html(
+          `<img src='${data.current.weather[0].icon}'></img> <h4>${currentDate}</h4>`
+        );
+      var body = $("div")
+        .addClass("card-body")
+        .html(
+          `<ul class='list-group'><li class='list-group-item'>Temperature: ${
+            data.current.temp
+          }°</li><li class="list-group-item">wind speed: ${(
+            data.current.wind_speed * 2.23694
+          ).toFixed(2)}mph</li><li class="list-group-item">humidity: ${
+            data.current.humidity
+          }%</li><li class="list-group-item">${data.daily[0].uvi}</li></ul>`
+        );
+      card.append(header);
+      card.append(body);
+      container.append(card);
+      forecastToday.append(container);
+
+      var weekData = data;
+      displayWeekForecast(data);
     });
+}
+
+function displayWeekForecast(data) {
+  for (var i = 1; i <= 5; i++) {
+    console.log(data.daily[i]);
+    //   console.log(icon);
+    var icon = `https://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`;
+    var dt = new Date(data.daily[i].dt * 1000);
+    var temp = data.daily[i].temp.day;
+    var wind = data.daily[i].wind_speed * 1000;
+    var hum = data.daily[i].humidity;
+
+    var container = $("div").addClass("col-2");
+    var card = $("div").addClass("card");
+    var header = $("h3")
+      .addClass("card-header mb-2")
+      .html(`<img src='${icon}'></img> <p>${dt}</p>`);
+    var body = $("div")
+      .addClass("card-body")
+      .html(
+        `<ul class='list-group'><li class='list-group-item'>Temperature: ${temp}°</li><li class="list-group-item">wind speed: ${wind}mph</li><li class="list-group-item">humidity: ${hum}%</li></ul>`
+      );
+  }
+  card.append(header);
+  card.append(body);
+  container.append(card);
+  forecastToday.append(container);
 }
 
 searchForm.addEventListener("submit", formSubmit);
