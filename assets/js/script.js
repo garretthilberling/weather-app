@@ -4,10 +4,13 @@ var searchCity = document.querySelector("#city-name");
 var cityResultSection = document.querySelector("#city-result");
 var forecastToday = document.querySelector("#forecast-today");
 var forecastWeek = document.querySelector("#forecast-week");
+var nameArr = [];
+var cityName = '';
+// console.log(nameArr);
 
 function formSubmit(event) {
   event.preventDefault();
-  var cityName =
+  cityName =
     searchCity.value.charAt(0).toUpperCase() + searchCity.value.slice(1).trim(); //the value entered by the viewer will always be returned with the first letter being capitalized.
   if (cityName) {
     getWeather(cityName);
@@ -15,11 +18,44 @@ function formSubmit(event) {
   } else {
     alert("Please provide a city name!");
   } 
-  localStorage.setItem('cityName', JSON.stringify(cityName++));
-  //   if (container) {
-  //       container.remove();
-  //   }
+
+  nameArr.push(cityName);
+  localStorage.setItem('cities', JSON.stringify(nameArr));
+
+  generateCityButtons(nameArr);
 }
+
+function generateCityButtons(city) {
+  $('#stored-cities').children().remove();
+  btnArr = ['stored-btn-1','stored-btn-2','stored-btn-3', 'stored-btn-4', 'stored-btn-5'];
+  for (var i = 0; i < 5; i++) {
+    $("<btn>").attr('type','button').attr('id','stored-btn-' + i).addClass("btn btn-primary mx-2 stored-btn").text(`${city[i]}`).appendTo("#stored-cities");
+    // var indivBtn = 'stored-btn-' + i;
+    btnArr[i].addEventListener('click', function (e) {
+      btnArr[i] === true
+    });
+    if (btnArr[i] === true) {
+      cityName = btnArr[i];
+    }
+  }
+  getWeather(cityName)
+}
+
+// function storedButtonSubmit (e) {
+//     // searchCity.value.charAt(0).toUpperCase() + searchCity.value.slice(1).trim(); //the value entered by the viewer will always be returned with the first letter being capitalized.
+//     btnArr = ['stored-btn-1', 'stored-btn-2', 'stored-btn-3', 'stored-btn-4']
+//     for (var i = 0; i < btnArr.length; i++) {
+//     if (btnArr[i] === true) {
+//       cityName = btnArr[i]
+//     }
+//   }
+//     if (cityName) {
+//     getWeather(cityName);
+//     searchCity.value = "";
+//   } else {
+//     alert("Please provide a city name!");
+//   }
+// }
 
 function getWeather(city) {
   $('#city-result').children().remove();
@@ -108,3 +144,5 @@ function displayWeekForecast (i,icon,dt,temp,wind,hum) {
 }
 
 searchForm.addEventListener("submit", formSubmit);
+
+// document.querySelector('.stored-btn').addEventListener("click", storedButtonSubmit);
