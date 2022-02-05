@@ -155,7 +155,7 @@ function displayWeekForecast(i, icon, dt, temp, wind, hum) {
     .addClass("card-body")
     .attr("id", "card-body" + i)
     .html(
-      `<ul class='list-group'><li class='list-group-item'>Temperature: ${temp}°</li><li class="list-group-item">wind speed: ${wind}mph</li><li class="list-group-item">humidity: ${hum}%</li></ul>`
+      `<ul class='list-group'><li class='list-group-item'>Temp: ${temp}°</li><li class="list-group-item">wind speed: ${wind}mph</li><li class="list-group-item">humidity: ${hum}%</li></ul>`
     )
     .appendTo("#card-" + i);
 }
