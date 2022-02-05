@@ -2,7 +2,7 @@ var apiKey = "ee668b86cfbebe9a187b56c01774d622";
 var searchForm = document.querySelector("#search-form");
 var searchCity = document.querySelector("#city-name");
 var cityResultSection = document.querySelector("#city-result");
-var forecastToday = document.querySelector("#forecast");
+var forecastToday = document.querySelector("#forecast-today");
 var forecastWeek = document.querySelector("#forecast-week");
 
 function formSubmit(event) {
@@ -14,13 +14,15 @@ function formSubmit(event) {
     searchCity.value = "";
   } else {
     alert("Please provide a city name!");
-  }
+  } 
+  localStorage.setItem('cityName', JSON.stringify(cityName++));
   //   if (container) {
   //       container.remove();
   //   }
 }
 
 function getWeather(city) {
+  $('#city-result').children().remove();
   var cityResult = document.createElement("div");
   cityResult.classList.add("card");
   cityResult.innerHTML = `<h3 class='card-header'>Showing forecast for ${city}:</h3>`;
@@ -50,63 +52,59 @@ function displayCurrentForecast(url) {
       }
     })
     .then(function (data) {
-      // console.log(data);
-      var currentDate = new Date(data.daily[0].dt * 1000);
-      // console.log(currentDate);
-      var container = $("div").addClass("col-2");
-      window.container = container;
-      var card = $("div").addClass("card");
-      var header = $("h3")
-        .addClass("card-header mb-2")
-        .html(
-          `<img src='${data.current.weather[0].icon}'></img> <h4>${currentDate}</h4>`
-        );
-      var body = $("div")
-        .addClass("card-body")
-        .html(
-          `<ul class='list-group'><li class='list-group-item'>Temperature: ${
-            data.current.temp
-          }°</li><li class="list-group-item">wind speed: ${(
-            data.current.wind_speed * 2.23694
-          ).toFixed(2)}mph</li><li class="list-group-item">humidity: ${
-            data.current.humidity
-          }%</li><li class="list-group-item">${data.daily[0].uvi}</li></ul>`
-        );
-      card.append(header);
-      card.append(body);
-      container.append(card);
-      forecastToday.append(container);
+      var date = new Date(data.current.dt * 1000).toLocaleDateString();
+      var uvi = data.current.uvi;
 
-      var weekData = data;
-      displayWeekForecast(data);
+      $('#forecast-today').children().remove();
+      $("<div>").addClass("col-6").attr('id', "forecast-container").appendTo('#forecast-today');
+      $("<div>").addClass("card").attr('id', "forecast-card").appendTo("#forecast-container");
+      $("<h3>").addClass("card-header mb-2").html(`<img src='https://openweathermap.org/img/w/${data.current.weather[0].icon}.png'></img> <p>${date}</p>`).appendTo("#forecast-card");
+      $("<h4>").addClass("card-body").attr('id',"card-body-0").html(`<ul class='list-group'><li class='list-group-item'>Temperature: ${
+        data.current.temp
+      }°</li><li class="list-group-item">wind speed: ${(
+        data.current.wind_speed
+        ).toFixed(2)}mph</li><li class="list-group-item">humidity: ${
+          data.current.humidity
+        }%</li><li class="list-group-item" id='uvi-item'>${uvi}</li></ul>`).appendTo("#forecast-card");
+        
+        if(uvi < 2) {
+          document.querySelector("#uvi-item").style.background = "green"
+        } else if (uvi > 2 && uvi <= 5) {
+          document.querySelector("#uvi-item").style.background = "yellow"
+        } else if (uvi > 5 && uvi <= 7) {
+          document.querySelector("#uvi-item").style.background = "orange"
+        } else if (uvi > 7) {
+          document.querySelector("#uvi-item").style.background = "red"
+        }
+      weekData(data);
     });
 }
 
-function displayWeekForecast(data) {
-  for (var i = 1; i <= 5; i++) {
-    console.log(data.daily[i]);
-    //   console.log(icon);
+function weekData(data) {
+$('#forecast-week').children().remove();  
+for (var i = 1; i <= 5; i++) {
+    console.log(data.daily[1].dt * 1000);
     var icon = `https://openweathermap.org/img/w/${data.daily[i].weather[0].icon}.png`;
-    var dt = new Date(data.daily[i].dt * 1000);
+    var dt = new Date(data.daily[i].dt * 1000).toLocaleDateString();
     var temp = data.daily[i].temp.day;
-    var wind = data.daily[i].wind_speed * 1000;
+    var wind = data.daily[i].wind_speed;
     var hum = data.daily[i].humidity;
+    displayWeekForecast(i,icon,dt,temp,wind,hum);
+}
+}
 
-    var container = $("div").addClass("col-2");
-    var card = $("div").addClass("card");
-    var header = $("h3")
-      .addClass("card-header mb-2")
-      .html(`<img src='${icon}'></img> <p>${dt}</p>`);
-    var body = $("div")
-      .addClass("card-body")
-      .html(
-        `<ul class='list-group'><li class='list-group-item'>Temperature: ${temp}°</li><li class="list-group-item">wind speed: ${wind}mph</li><li class="list-group-item">humidity: ${hum}%</li></ul>`
-      );
-  }
-  card.append(header);
-  card.append(body);
-  container.append(card);
-  forecastToday.append(container);
+function displayWeekForecast (i,icon,dt,temp,wind,hum) {
+  
+        $("<div>").addClass("col-2").attr('id', 'card-container' + i).appendTo('#forecast-week');
+        $("<div>").addClass("card").attr('id', "card-" + i).appendTo('#card-container' + i);
+        $("<h3>")
+          .addClass("card-header mb-2")
+          .html(`<img src='${icon}'></img> <p>${dt}</p>`).appendTo('#card-' + i);
+        $("<h4>")
+          .addClass("card-body").attr('id', "card-body" + i)
+          .html(
+            `<ul class='list-group'><li class='list-group-item'>Temperature: ${temp}°</li><li class="list-group-item">wind speed: ${wind}mph</li><li class="list-group-item">humidity: ${hum}%</li></ul>`
+          ).appendTo('#card-' + i);
 }
 
 searchForm.addEventListener("submit", formSubmit);
