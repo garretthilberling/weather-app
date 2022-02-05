@@ -11,11 +11,14 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <link href="./assets/css/style.css" />
   </head>
-  <body class="min-100-vh style">
+  <body class="min-100-vh style  bg-primary">
     <header>
-      <h2>Weather App</h2>
+      <div class="container-fluid d-flex justify-content-center my-4">
+      <h2 class="text-white"><i class="fas fa-sun fa-lg"></i> Weather-Tron Pro</h2>
+      </div>
     </header>
     <section class="container">
     <div>
@@ -25,25 +28,22 @@
             <h3 class="card-header">Search for City</h3>
             <form class="card-body" id="search-form">
               <label class="form-label" for="city">Enter City Name</label>
-              <input id="city-name" type="text" autofocus="true" />
-              <button type="submit">Search</button>
+              <span class="input-group mb-3"><input id="city-name" type="text" autofocus="true" class="form-control" /></span>
+              <button type="submit" class="btn btn-success">Search</button>
               <span id="stored-cities"></span>
             </form>
+            <div id="city-result"></div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div>
-      <div id="city-result" class="card"></div>
+      <div id="forecast-today" class="row my-3"></div>
     </div>
 
     <div>
-      <div id="forecast-today" class="row"></div>
-    </div>
-
-    <div>
-      <div id="forecast-week" class="row"></div>
+      <div id="forecast-week" class="row mb-5"></div>
     </div>
 
   </section>

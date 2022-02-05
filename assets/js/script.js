@@ -31,7 +31,7 @@ function formSubmit(event) {
 
 function generateCityButtons(city) {
   $("#stored-cities").children().remove();
-  for (var i = 0; i <= 3; i++) {
+  for (var i = 0; i <= 10; i++) {
     var storedBtn = $("<btn>")
     .attr('id', `stored-btn-submit${+i}`)
       .attr("type", "button")

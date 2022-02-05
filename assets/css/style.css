@@ -1,10 +1,3 @@
-:root {
---uvi-favorable: green; 
---uvi-moderate: yellow;
---uvi-high: orange;
---uvi-very-high: red;
-}
-
 .card-1, .card-2, .card-3, .card-4, .card-5 {
     Color: white;
     background-color: rgb(31, 29, 29);
